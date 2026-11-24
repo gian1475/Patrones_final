@@ -4,17 +4,18 @@ import cafeteria.comportamiento.observer.Cocina;
 import cafeteria.comportamiento.observer.ObservadorPedido;
 import cafeteria.comportamiento.observer.PantallaCliente;
 import cafeteria.creacional.BebidaFactory;
+import cafeteria.creacional.ExtraFactory;
 import cafeteria.creacional.PedidoBuilder;
 import cafeteria.creacional.RegistroPedidos;
 import cafeteria.estructural.adapter.MetodoPago;
 import cafeteria.estructural.adapter.PagoEfectivo;
 import cafeteria.estructural.adapter.YapeAdapter;
-import cafeteria.estructural.decorator.ConCanela;
-import cafeteria.estructural.decorator.ConCrema;
-import cafeteria.estructural.decorator.ConLeche;
 import cafeteria.estructural.proxy.ReporteVentasProxy;
 import cafeteria.modelo.Bebida;
 import cafeteria.modelo.Pedido;
+import cafeteria.persistencia.ConexionBD;
+import cafeteria.persistencia.PedidoDAO;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,19 +29,38 @@ public class CafeteriaFacade {
     // Observadores del patron OBSERVER
     private final ObservadorPedido cocina = new Cocina();
     private final ObservadorPedido pantalla = new PantallaCliente();
+    // Otros observadores que se pueden sumar sin tocar Pedido (por ejemplo, la tabla de la ventana)
+    private final List<ObservadorPedido> otrosObservadores = new ArrayList<>();
+    // El DAO tambien es observador: guarda en la base de datos cada cambio de estado
+    private final ObservadorPedido baseDatos = new PedidoDAO();
+
+    public CafeteriaFacade() {
+        // Los pedidos que se cargaron de la base de datos tambien deben avisar a cocina, pantalla y BD
+        for (Pedido p : registro.getPedidos()) suscribirObservadores(p);
+    }
+
+    /** Suma un observador nuevo (por ejemplo, la tabla de la ventana) a los pedidos actuales y futuros. */
+    public void agregarObservador(ObservadorPedido observador) {
+        otrosObservadores.add(observador);
+        for (Pedido p : registro.getPedidos()) p.suscribir(observador);
+    }
+
+    public boolean baseDatosConectada() { return ConexionBD.disponible(); }
+
+    public String errorBaseDatos() { return ConexionBD.getError(); }
+
+    private void suscribirObservadores(Pedido pedido) {
+        pedido.suscribir(cocina);
+        pedido.suscribir(pantalla);
+        pedido.suscribir(baseDatos);
+        for (ObservadorPedido o : otrosObservadores) pedido.suscribir(o);
+    }
 
     public Bebida prepararBebida(int tipo, List<Integer> extras) {
         // Aca se usa el patron FACTORY: crea la bebida base sin hacer new Cafe()
         Bebida bebida = BebidaFactory.crear(tipo);
         // Aca se usa el patron DECORATOR: cada extra envuelve a la bebida anterior
-        for (int extra : extras) {
-            switch (extra) {
-                case 1: bebida = new ConLeche(bebida); break;
-                case 2: bebida = new ConCrema(bebida); break;
-                case 3: bebida = new ConCanela(bebida); break;
-                default: break;
-            }
-        }
+        for (int extra : extras) bebida = ExtraFactory.agregar(bebida, extra);
         return bebida;
     }
 
@@ -64,9 +84,10 @@ public class CafeteriaFacade {
 
     private Pedido cobrarYRegistrar(Pedido pedido, MetodoPago pago) {
         if (!pago.pagar(pedido.getTotal())) return null;
-        // Aca se usa el patron OBSERVER: cocina y pantalla se suscriben al pedido
-        pedido.suscribir(cocina);
-        pedido.suscribir(pantalla);
+        pedido.setMetodoPago(pago.getNombre());
+        // Aca se usa el patron OBSERVER: cocina, pantalla y la base de datos se suscriben al pedido
+        suscribirObservadores(pedido);
+        // SINGLETON: se guarda en el registro unico (y este lo guarda en la base de datos)
         registro.registrar(pedido);
         return pedido;
     }

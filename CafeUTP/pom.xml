@@ -17,6 +17,15 @@
         <exec.mainClass>cafeteria.app.Main</exec.mainClass>
     </properties>
 
+    <dependencies>
+        <!-- Driver para conectarse a PostgreSQL (Neon). Copia local en lib/ para correr sin Maven. -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.7</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

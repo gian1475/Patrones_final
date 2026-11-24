@@ -15,6 +15,7 @@ import java.util.List;
 public class Pedido implements Cloneable {
     private int id;   // lo asigna RegistroPedidos al registrar
     private final String cliente;
+    private String metodoPago = "";   // "Efectivo" o "Yape"; se guarda en la base de datos
     private List<Bebida> bebidas = new ArrayList<>();
     private EstadoPedido estado = new Registrado();
     private List<ObservadorPedido> observadores = new ArrayList<>();
@@ -24,6 +25,9 @@ public class Pedido implements Cloneable {
     }
 
     public void setId(int id) { this.id = id; }
+
+    public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
+    public String getMetodoPago() { return metodoPago; }
 
     public void agregarBebida(Bebida b) { bebidas.add(b); }
 

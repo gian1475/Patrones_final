@@ -1,0 +1,6 @@
+# Clave de la base de datos: se comparte por privado, nunca en GitHub
+.env
+
+# Archivos compilados
+CafeUTP/clases/
+CafeUTP/target/
