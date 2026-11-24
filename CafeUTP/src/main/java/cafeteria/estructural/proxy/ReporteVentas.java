@@ -3,7 +3,7 @@ package cafeteria.estructural.proxy;
 import cafeteria.creacional.RegistroPedidos;
 import cafeteria.modelo.Pedido;
 
-/** Sujeto real: muestra todas las ventas registradas. */
+/** Sujeto real (RealSubject) del patron PROXY: muestra todas las ventas. Solo se llega a el a traves del proxy. */
 public class ReporteVentas implements Reporte {
     @Override
     public void mostrar() {

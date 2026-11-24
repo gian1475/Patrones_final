@@ -1,6 +1,7 @@
 package cafeteria.estructural.adapter;
 
 /**
+ * Clase adaptada (Adaptee) del patron ADAPTER.
  * Simula una API externa de billetera digital.
  * Su interfaz es INCOMPATIBLE con MetodoPago: pide celular y monto en centimos
  * y responde un texto en lugar de un boolean.

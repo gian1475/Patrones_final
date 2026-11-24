@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/** Menu de consola. Solo habla con la Fachada. */
+/**
+ * Menu de consola. Es el "cliente" del patron FACADE: solo habla con CafeteriaFacade
+ * y no conoce la fabrica, los decoradores, los pagos ni el registro.
+ */
 public class Main {
     private static final Scanner sc = new Scanner(System.in);
     private static final CafeteriaFacade cafeteria = new CafeteriaFacade();

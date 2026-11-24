@@ -1,5 +1,6 @@
 package cafeteria.estructural.adapter;
 
+/** Pago normal del patron ADAPTER: ya cumple la interfaz MetodoPago, asi que no necesita adaptador. */
 public class PagoEfectivo implements MetodoPago {
     @Override
     public boolean pagar(double monto) {
